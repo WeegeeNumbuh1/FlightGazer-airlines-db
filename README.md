@@ -38,6 +38,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 | `UIT` | UNIVERSITETET I TROMSO | NORWAY | ARTIC | Universitetet I Tromso | University of Tromsø School of Aviation | **University of Tromso School of Aviation** |
 | `USC` | AIRNET II | UNITED STATES | STAR CHECK | Airnet Ii | AirNet Express | **Airnet II** |
 | `VOI` | CONCESIONARIA VUELA COMPANIA DE AVIACION, S.A. DE C.V. | MEXICO | VOLARIS | Concesionaria Vuela Compania De Aviacion | Volaris | **Volaris** |
+| `VIV` | AEROENLACES NACIONALES, S.A. DE C.V. | MEXICO | AEROENLACES | Aeroenlaces Nacionales | Aeroenlaces Nacionales | **Viva** |
 | `WIS` | PRO-AIRE CARGO AND CONSULTING, INC. D/B/A PACCAIR (NEENAH, WI) | UNITED STATES | WISCAIR | Pro Aire Cargo And Consulting | Paccair | **Paccair** |
 
 > Note: the above was based on `tar1090-db` version `3.14.1686`
@@ -52,19 +53,24 @@ Needed a database that was more consistent for use with FlightGazer but did not 
   - "**LOT Polish Airlines**" instead of *Polskie Linie Lotnicze*
   - "**Turkish Airlines**" instead of *Turk Hava Yollari*
 - Preserve specific capitalizations and punctuation used by the company, e.g. camelCase, acronyms, hyphens, commas, and ampersands
-  - e.x.: easyJet Europe, ABX Air, ForeFlight, Lease-a-Plane International
-- Convert titles into *proper* title case
+  - easyJet Europe, ABX Air, ForeFlight, Lease-a-Plane International
+- Convert titles into *proper* title case, along with preferred English names or English translation with correct demonyms, *if possible*
   - "**U.S. Department of the Interior**" instead of *US Department Of The Interior Office Of Aircraft Services*
-- Prefer English names or the equivalent English translation, *if possible*
   - "**Italian Coast Guard**" instead of *Guardia Costiera Italiana*
+  - "**Turkmenistani Government**" instead of *Turkmenhowayollary*
 - Use shorter names *and* drop company types, *if possible*
   - "**FSB Flugservice & Development**" instead of *FSB FLUGSERVICE & DEVELOPMENT GMBH, BERLIN-SCHOENEFELD*
   - "**Performance Transportacion**" instead of *PERFORMANCE TRANSPORTACION, S.A. DE C.V.*
 - Keep airlines as distinctive as possible with the least amount of additional information
   - If an airline operates different branches in other countries, distinguish them by that country
-    - e.x.: Aer Lingus *versus* Aer Lingus UK
-  - Avoid/drop parenthetical phrases, *if possible*
-    - e.x.: "**Haiti National Airlines**" instead of *Haiti National Airlines (HANA)*
+    - Aer Lingus *versus* Aer Lingus UK
+  - Drop common phrases such as *Airlines*, *Aviation*, or *Charter* unless it is explicitly used in the name or adds additional distinction
+    - "**Utair**" instead of *Utair Aviation*
+  - Avoid/drop parenthetical phrases when not needed
+    - "**Haiti National Airlines**" instead of *Haiti National Airlines (HANA)*
+  - Expand acronyms for clarity, *if needed*
+    - "**United Parcel Service**" instead of *UPS*
+    - "**The Cargo Airlines**" instead of *TCA*
 
 ## Tools
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
@@ -80,11 +86,13 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 ### Friendly Names
 - [`tar1090-db`](https://github.com/wiedehopf/tar1090-db/blob/master/db/operators.js)
 - [Wikipedia](https://en.wikipedia.org/wiki/List_of_airline_codes)
+- [Flightradar24](https://www.flightradar24.com/data/airlines)
 - [This CSV](https://github.com/tomcarman/skystats/blob/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv)
 
 ### Cross-Check
+- Planespotters
+- Jetphotos
 - FlightAware
-- Flightradar24
 - AirNav Radar
 - Google
 
@@ -92,6 +100,8 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 - This database is reliant on what is published on the FAA's side. Errors and omissions originating from them will be inherited by this database as well.
 - Obvious but easily rectifed encoding errors present in the FAA database are corrected to the most reasonable solution in this database.
 - Airlines and operators which do not have an ICAO 3-letter callsign prefix are not covered by this database.
+- Airlines that are removed in future publications will remain in this database until they are reallocated.
+- Some airlines not officially listed by the FAA may be manually added to this database if their operation can be confirmed.
 - The data presented in this database may not be fully accurate and may fall out of date over time.
 - Maintenance of this database and repo is not guaranteed.
 

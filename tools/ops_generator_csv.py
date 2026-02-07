@@ -1,10 +1,13 @@
 """ Script that downloads the FAA's list of ICAO airline codes and formats it into a CSV.
-This was modified from the FlightGazer (https://github.com/WeegeeNumbuh1/FlightGazer) project's `operators_generator.py` file.
-To see changes on the FAA's side: https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap0_cam.html """
+Additionally grabs data from other known airline 'databases' and compiles it into this CSV as well.
+This was modified from the FlightGazer
+(https://github.com/WeegeeNumbuh1/FlightGazer) project's `operators_generator.py` file. """
 
 """ Programmer's notes:
 This generates a CSV that *needs* manual evaluation afterwards;
-the generated CSV is not fit for end-use. """
+the generated CSV is not fit for end-use.
+To see changes on the FAA's side:
+https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap0_cam.html """
 # by WeegeeNumbuh1
 # Originally based on Flightgazer version v.9.9.1
 
@@ -23,7 +26,7 @@ from pathlib import Path
 import datetime
 
 datenow = datetime.datetime.now(tz=datetime.timezone.utc)
-date_gen_str = datenow.strftime("%Y-%m-%dT%H:%M:%SZ")
+date_gen_str = datenow.strftime("%Y-%m-%dT%H%M%SZ")
 current_path = Path(__file__).resolve().parent
 write_path = Path(current_path,
                   f'operators_to_evaluate_[{date_gen_str}].csv')
@@ -35,6 +38,8 @@ old_version_time = None
 import unicodedata
 import gzip
 import ast
+import csv
+from io import StringIO
 try:
     import requests
 except ImportError:
@@ -58,20 +63,29 @@ FAA_source = 'https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3
 tar1090db = 'https://github.com/wiedehopf/tar1090-db/raw/refs/heads/master/db/operators.js'
 tar1090db_ver = 'https://raw.githubusercontent.com/wiedehopf/tar1090-db/refs/heads/master/version'
 
-header_str = "3Ltr,Company,Country,Telephony,tar1090-db,Wikipedia\n"
+header_str = "3Ltr,Company,Country,Telephony,tar1090-db,Wikipedia,airlines,fr24\n"
 
 user = UserAgent(browsers=['Chrome', 'Edge', 'Firefox'], platforms='desktop')
 HTML_header = {'User-Agent': str(user.random)}
 
-def dict_lookup(list_of_dicts: list, key: str, search_term: str) -> list | None:
-    """ Function pulled directly from FlightGazer, modified to pull all matching results.
-    Returns None for no result. """
+def dict_lookup(
+        list_of_dicts: list,
+        key: str,
+        search_term: str,
+        return_all=False
+    ) -> list[dict] | dict | None:
+    """ Function pulled directly from FlightGazer. Set `return_all` to `True` to return
+    all matches, if not, returns a dict of the first matching result.
+    Returns `None` for no result. """
     if not search_term:
         return None
     results = []
     try:
         for dict_ in [x for x in list_of_dicts if x.get(key) == search_term]:
-            results.append(dict_)
+            if not return_all:
+                return dict_
+            else:
+                results.append(dict_)
         if results:
             return results
         else:
@@ -137,7 +151,7 @@ def extractor() -> dict | None:
         print(f"Failed to get database: {e}")
         return None
 
-def wikipedia_fetcher() -> list:
+def wikipedia_fetcher() -> list[dict]:
     """ Grab data from Wikipedia for our operator friendly names.
     Returns a list of dictionaries, each with the keys
     {'IATA', 'ICAO', 'Airline', 'Call sign', 'Country/Region', 'Comments'}.
@@ -202,6 +216,82 @@ def wikipedia_fetcher() -> list:
           f"in {(perf_counter() - find_start):.2f} seconds.")
     return data_wikipedia
 
+def fr24_reader() -> list[dict]:
+    """ Parse Flightradar24's airlines list.
+    Returns a list of dicts, {`3Ltr`, `Name`} """
+    print("Downloading supplementary info from Flightradar24...")
+    download_start = perf_counter()
+    try:
+        dataset4 = requests.get('https://www.flightradar24.com/data/airlines', headers=HTML_header, timeout=5)
+        dataset4.raise_for_status()
+        download_end = (perf_counter() - download_start)
+        if dataset4.status_code != 200:
+            raise requests.HTTPError(f'Got status code {dataset4.status_code}') from None
+    except Exception as e:
+        print(f"Failed get data from Flightradar24: {e}")
+        return []
+    download_size = len(dataset4.content)
+    print(f"Successfully downloaded {(download_size / (1024 * 1024)):.2f} "
+         f"MiB of data in {download_end:.2f} seconds.")
+    find_start = perf_counter()
+    soup = bs(dataset4.text, 'html.parser')
+    tables = soup.find_all('table')
+    if len(tables) != 1: # there should only be 1 main table
+        print("Received more tables than expected from Flightradar24, no data will be returned.")
+        return []
+    cells = []
+    data_fr24 = []
+    for table in tables:
+        for row in table.find_all('tr'):
+            cell = [td.get_text(strip=True, separator=" ") for td in row.find_all('td')]
+            cells.append(cell)
+    for row in cells:
+        # table layout: | [margin] | logo | Name | 3Ltr | aircraft count | [margin] | == 6
+        # category header: | [margin] | category (1st number or letter) | [margin] | [margin] | == 4
+        if len(row) == 6:
+            ltr_ = row[3].split()
+            if len(ltr_) > 1: # ex: 'IATA / ICAO'
+                ltr = ltr_[-1]
+            else:
+                ltr = ltr_[0]
+            airline = {
+                '3Ltr': normalize(ltr.upper()),
+                'Name': strip_accents(row[2])
+            }
+            data_fr24.append(airline)
+
+    print(f"Parsed {len(data_fr24)} rows from Flightradar24 "
+          f"in {(perf_counter() - find_start):.2f} seconds.")
+    return data_fr24
+
+def csv_reader() -> dict:
+    """ Pulls data from `airlines_csv` into a usable dict. """
+    """ Headers: Code, Name, ICAO, IATA, PositioningFlightPattern, CharterFlightPattern """
+    airlines_csv = 'https://github.com/tomcarman/skystats/raw/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv'
+    download_start = perf_counter()
+    print("Pulling additional data...")
+    try:
+        dataset3 = requests.get(airlines_csv, headers=HTML_header, timeout=5)
+        dataset3.raise_for_status()
+        download_end = (perf_counter() - download_start)
+        if dataset3.status_code != 200:
+            raise requests.HTTPError(f'Got status code {dataset3.status_code}') from None
+    except Exception as e:
+        print(f"Failed get data: {e}")
+        return {}
+    download_size = len(dataset3.content)
+    print(f"Successfully downloaded {(download_size / (1024 * 1024)):.2f} "
+         f"MiB of data in {download_end:.2f} seconds.")
+    csv_start = perf_counter()
+    csv_reader = csv.DictReader(StringIO(dataset3.text))
+    try:
+        data = {row['\ufeffCode']: row for row in csv_reader}
+    except KeyError:
+        print(f"Failed to parse CSV: {e}")
+        return {}
+    print(f"Processed {len(data)} entries in {(perf_counter() - csv_start) * 1000:.3} ms.")
+    return data
+
 print("Downloading data from the FAA...")
 try:
     download1 = perf_counter()
@@ -224,6 +314,9 @@ data2 = []
 friendly_available = True
 data_tar1090 = extractor()
 data2 = wikipedia_fetcher()
+data3 = csv_reader()
+data4 = fr24_reader()
+
 if not data2:
     print("WARNING: friendly operator names will be unavailable in this dataset.")
     friendly_available = False
@@ -244,8 +337,15 @@ with open(write_path, 'w', encoding='utf-8') as file:
                 friendly2 = ''
                 entry: dict = data_tar1090.get(ICAO_name, {})
                 friendly = strip_accents(entry.get('n', ''))
+                entry2: dict = data3.get(ICAO_name, {})
+                friendly3 = strip_accents(entry2.get('Name', ''))
+                if not (entry3 := dict_lookup(data4, '3Ltr', ICAO_name)):
+                    friendly4 = ''
+                else:
+                    friendly4 = entry3.get('Name', '')
                 if data2:
-                    if (matching_entries := dict_lookup(data2, 'ICAO', ICAO_name)) is not None:
+                    if (matching_entries := dict_lookup(
+                        data2, 'ICAO', ICAO_name, return_all=True)) is not None:
                         for entry in matching_entries:
                             if cols[3].text.strip().upper() == entry.get('Call sign', ''):
                                 # callsign from the FAA and Wikipedia matches, use this name
@@ -262,6 +362,8 @@ with open(write_path, 'w', encoding='utf-8') as file:
                     telephony = normalize(cols[3].text)
                     tar1090db = normalize(friendly)
                     wikipedia = normalize(friendly2)
+                    airlines = normalize(friendly3)
+                    fr24 = normalize(friendly4)
 
                 file.write(
                     f"\"{ltr}\","
@@ -269,7 +371,9 @@ with open(write_path, 'w', encoding='utf-8') as file:
                     f"\"{country}\","
                     f"\"{telephony}\","
                     f"\"{tar1090db}\","
-                    f"\"{wikipedia}\"\n"
+                    f"\"{wikipedia}\","
+                    f"\"{airlines}\","
+                    f"\"{fr24}\"\n"
                 )
 
         print(f"Wrote table '{alphabet[i]}' with {j} entries.")
@@ -278,6 +382,8 @@ with open(write_path, 'w', encoding='utf-8') as file:
 print(f"A total of {linecount} entries were written in "
       f"{(perf_counter() - write_start):.2f} seconds.")
 print(f"Resulting file size: {(write_path.stat().st_size) / (1024):.3f} KiB.")
+
+print("\nIMPORTANT: This generated CSV needs to be manually reviewed and analyzed.\n")
 
 print(f"Total wall time: {perf_counter() - script_start:.2f} seconds.")
 print("\n***** Done. *****")
