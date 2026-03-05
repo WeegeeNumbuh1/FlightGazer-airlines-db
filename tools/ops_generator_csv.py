@@ -126,7 +126,7 @@ def extractor() -> dict | None:
     a dictionary of it for use later. Returns None for any failure. """
     """ Programmer's notes: the file is a javascript 'database' that's conveniently
     in the form of {'ABC': {'n': name, 'c': country, 'r': callsign/telephony}, ...} """
-    print("Downloading operators database from tar1090-db...")
+    print("> Downloading operators database from tar1090-db...")
     try:
         tar1090db_verstr = 'Unknown'
         download_start = perf_counter()
@@ -156,7 +156,7 @@ def wikipedia_fetcher() -> list[dict]:
     Returns a list of dictionaries, each with the keys
     {'IATA', 'ICAO', 'Airline', 'Call sign', 'Country/Region', 'Comments'}.
     If any error occurs, returns an empty list. """
-    print("Downloading supplementary info from Wikipedia...")
+    print("> Downloading supplementary info from Wikipedia...")
     download_start = perf_counter()
     try:
         dataset2 = requests.get('https://en.wikipedia.org/wiki/List_of_airline_codes', headers=HTML_header, timeout=5)
@@ -219,7 +219,7 @@ def wikipedia_fetcher() -> list[dict]:
 def fr24_reader() -> list[dict]:
     """ Parse Flightradar24's airlines list.
     Returns a list of dicts, {`3Ltr`, `Name`} """
-    print("Downloading supplementary info from Flightradar24...")
+    print("> Downloading supplementary info from Flightradar24...")
     download_start = perf_counter()
     try:
         dataset4 = requests.get('https://www.flightradar24.com/data/airlines', headers=HTML_header, timeout=5)
@@ -237,7 +237,8 @@ def fr24_reader() -> list[dict]:
     soup = bs(dataset4.text, 'html.parser')
     tables = soup.find_all('table')
     if len(tables) != 1: # there should only be 1 main table
-        print("Received more tables than expected from Flightradar24, no data will be returned.")
+        print(f"Received incorrect amount of tables ({len(tables)}) than expected "
+              "from Flightradar24, no data will be returned.")
         return []
     cells = []
     data_fr24 = []
@@ -269,7 +270,7 @@ def csv_reader() -> dict:
     """ Headers: Code, Name, ICAO, IATA, PositioningFlightPattern, CharterFlightPattern """
     airlines_csv = 'https://github.com/tomcarman/skystats/raw/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv'
     download_start = perf_counter()
-    print("Pulling additional data...")
+    print("> Pulling additional data...")
     try:
         dataset3 = requests.get(airlines_csv, headers=HTML_header, timeout=5)
         dataset3.raise_for_status()
@@ -292,7 +293,7 @@ def csv_reader() -> dict:
     print(f"Processed {len(data)} entries in {(perf_counter() - csv_start) * 1000:.3} ms.")
     return data
 
-print("Downloading data from the FAA...")
+print("> Downloading data from the FAA...")
 try:
     download1 = perf_counter()
     dataset = requests.get(FAA_source, headers=HTML_header, timeout=5)
@@ -316,10 +317,6 @@ data_tar1090 = extractor()
 data2 = wikipedia_fetcher()
 data3 = csv_reader()
 data4 = fr24_reader()
-
-if not data2:
-    print("WARNING: friendly operator names will be unavailable in this dataset.")
-    friendly_available = False
 
 print(f"Writing to {write_path}...")
 
@@ -356,6 +353,7 @@ with open(write_path, 'w', encoding='utf-8') as file:
                             # if the country does not match (name got reallocated somewhere else) don't use this result
                             friendly2 = ''
 
+                    # would be "faster" if the normalization was done just once, but eh
                     ltr = normalize(cols[0].text)
                     company = normalize(cols[1].text)
                     country = normalize(cols[2].text)
