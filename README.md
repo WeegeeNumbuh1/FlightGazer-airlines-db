@@ -46,35 +46,43 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 </details>
 
 ## Formatting Priorities \& Requirements
-- Only use ASCII printable characters
+- **Only use ASCII printable characters**
 - Use the most common name known by the public or what they're doing business as, not the company's legal name
   - "**Volaris**" instead of *Concesionaria Vuela Compania De Aviacion*
   - "**Paccair**" instead of *Pro-Aire Cargo and Consulting*
   - "**LOT Polish Airlines**" instead of *Polskie Linie Lotnicze*
   - "**Turkish Airlines**" instead of *Turk Hava Yollari*
+- Apply proper capitalization rules unless it's stylized
+  - "**Servicios Aereos Ejecutivos de la Laguna**" instead of *Servicios Aereos Ejecutivos De La Laguna*
 - Preserve specific capitalizations and punctuation used by the company, e.g. camelCase, acronyms, hyphens, commas, and ampersands
   - easyJet Europe, ABX Air, ForeFlight, Lease-a-Plane International
-- Convert titles into *proper* title case, along with preferred English names or English translation with correct demonyms, *if possible*
+- Convert government titles into *proper* title case, along with preferred English names or English translation with correct demonyms, *if possible*
   - "**U.S. Department of the Interior**" instead of *US Department Of The Interior Office Of Aircraft Services*
   - "**Italian Coast Guard**" instead of *Guardia Costiera Italiana*
   - "**Turkmenistani Government**" instead of *Turkmenhowayollary*
 - Use shorter names *and* drop company types, *if possible*
   - "**FSB Flugservice & Development**" instead of *FSB FLUGSERVICE & DEVELOPMENT GMBH, BERLIN-SCHOENEFELD*
   - "**Performance Transportacion**" instead of *PERFORMANCE TRANSPORTACION, S.A. DE C.V.*
+  - "**Island Wings Charter**" (Bahamas) *versus* "**Island Wings Inc**" (USA)
 - Keep airlines as distinctive as possible with the least amount of additional information
-  - If an airline operates different branches in other countries, distinguish them by that country
-    - Aer Lingus *versus* Aer Lingus UK
+  - If an airline operates different branches in other countries, or, if an airline that shares the same name with another airline in a different country, distinguish them by country
+    - "**Aer Lingus**" *versus* "**Aer Lingus UK**"
+      - (note: the latter operates under the former)
+    - "**Sun Air (Egypt)**" *versus* "**Sun Air (Sudan)**" *versus* "**Sun Air Bulgaria**" *versus* "**Sun Air (Vietnam)**"
+      - (note: none of the above are related to each other)
   - Drop common phrases such as *Airlines*, *Aviation*, or *Charter* unless it is explicitly used in the name or adds additional distinction
-    - "**Utair**" instead of *Utair Aviation*
+    - "**SWISS**" instead of *Swiss Airlines*
+    - "**Jazz**" instead of *Jazz Aviation*
   - Avoid/drop parenthetical phrases when not needed
     - "**Haiti National Airlines**" instead of *Haiti National Airlines (HANA)*
   - Expand acronyms for clarity, *if needed*
     - "**United Parcel Service**" instead of *UPS*
     - "**The Cargo Airlines**" instead of *TCA*
+    - "**Brazilian Express Transportes Aereos** instead of *BETA*
 
 ## Tools
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
-You can create a version compatible with `tar1090` using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py). This is untested but should work.
+You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py). This is untested but should work.
 
 ## Contributions \& Corrections
 Want to help keep this database up-to-date? Found an error? Want to make a correction? Please file an issue with this repository.
