@@ -29,7 +29,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 | `EIN` | AER LINGUS TEORANTA | IRELAND | SHAMROCK | Aer Lingus Teoranta | Aer Lingus | **Aer Lingus** |
 | `GCI` | GUARDIA COSTIERA ITALIANA | ITALY | ITALIAN COAST GUARD | Guardia Costiera Italiana | Italian Coast Guard | **Italian Coast Guard** |
 | `JBU` | JETBLUE AIRWAYS CORPORATION (NEW YORK, NY) | UNITED STATES | JETBLUE | Jetblue Airways Corporation | JetBlue Airways| **JetBlue** |
-| `JZA` | JAZZ AVIATION LP | CANADA | JAZZ | Jazz Aviation | Air Canada Jazz | **Air Canada Jazz** |
+| `JZA` | JAZZ AVIATION LP | CANADA | JAZZ | Jazz Aviation | Air Canada Jazz | **Jazz** |
 | `LOT` | LOT - POLSKIE LINIE LOTNICZE | POLAND | LOT | Polskie Linie Lotnicze | LOT Polish Airlines | **LOT Polish Airlines** |
 | `TCN` | JEM AIR HOLDINGS, LLC | UNITED STATES | TRANSCON | Jem Air Holdings | Trans Continental Airlines | **Jet Excellence** |
 | `RCJ` | HAWKER BEECHCRAFT LTD | UNITED KINGDOM | NEWPIN | Hawker Beechcraft | Raytheon Corporate Jets | **Hawker Beechcraft** |
@@ -73,6 +73,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
   - Drop common phrases such as *Airlines*, *Aviation*, or *Charter* unless it is explicitly used in the name or adds additional distinction
     - "**SWISS**" instead of *Swiss Airlines*
     - "**Jazz**" instead of *Jazz Aviation*
+    - "**American Airlines**" instead of *American*
   - Avoid/drop parenthetical phrases when not needed
     - "**Haiti National Airlines**" instead of *Haiti National Airlines (HANA)*
   - Expand acronyms for clarity, *if needed*
@@ -82,6 +83,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 
 ## Tools
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
+The final CSV in this repo is derived from the output of the [`ops_generator.py`](./tools/ops_generator_csv.py) script in this directory.<br>
 You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py). This is untested but should work.
 
 ## Contributions \& Corrections
