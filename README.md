@@ -7,7 +7,7 @@
 <!-- end title section -->
 
 ## What This Is
-This is a "database" of airlines and operators with their more common names and with the proper capitialization and formatting.<br>
+This is a "database" of airlines and operators with their more common names, proper capitialization, and formatting following [these guidelines](#formatting-priorities--requirements).<br>
 This is a **manually** curated/maintained list based on the FAA's "Three−Letter Designator/Aircraft Company/Telephony Decode" table with the "friendly names" cross-checked and sourced from [the sources below](#sources).<br>
 
 This repo is designed for the [FlightGazer](https://github.com/WeegeeNumbuh1/FlightGazer) project.<br>
@@ -24,6 +24,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 `AAV` | ASTRO AIR INTERNATIONAL, INC. DBA OF PAN PACIFIC AIRLINES | PHILIPPINES | ASTRO-PHIL | Astro Air International | Astro Air International | **Pan Pacific Airlines** |
 | `ABX` | ABX AIR, INC. (WILMINGTON, OH) | UNITED STATES | ABEX | Abx Air | ABX Air | **ABX Air** |
 | `CMP` | COMPANIA PANAMENA DE AVIACION, S.A. | PANAMA | COPA | Compania Panamena De Aviacion | Copa Airlines | **Copa Airlines** |
+| `CNS` | COBALT AIR, LLC (PORTSMOUTH NH) | UNITED STATES | CHRONOS | Cobalt Air | PlaneSense | **Cobalt Air (PlaneSense)** |
 | `CXK` | ATP FLIGHT SCHOOL | UNITED STATES | CAREER TRACK | Atp Flight School | *null* | **ATP Flight School** |
 | `DOI` | U.S. DEPARTMENT OF THE INTERIOR, OFFICE OF AIRCRAFT SERVICES, (BOISE, ID) | UNITED STATES | INTERIOR | US Department Of The Interior Office Of Aircraft Services | U.S. Department of the Interior | **U.S. Department of the Interior** |
 | `EIN` | AER LINGUS TEORANTA | IRELAND | SHAMROCK | Aer Lingus Teoranta | Aer Lingus | **Aer Lingus** |
@@ -46,9 +47,11 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 </details>
 
 ## Formatting Priorities \& Requirements
+<details><summary><b>Expand/Collapse</b></summary>
+
 - **Only use ASCII printable characters**
 - Use the most common name known by the public or what they're doing business as, not the company's legal name
-  - "**Volaris**" instead of *Concesionaria Vuela Compania De Aviacion*
+  - "**Volaris**" instead of *Concesionaria Vuela Compania de Aviacion*
   - "**Paccair**" instead of *Pro-Aire Cargo and Consulting*
   - "**LOT Polish Airlines**" instead of *Polskie Linie Lotnicze*
   - "**Turkish Airlines**" instead of *Turk Hava Yollari*
@@ -65,21 +68,26 @@ Needed a database that was more consistent for use with FlightGazer but did not 
   - "**Performance Transportacion**" instead of *PERFORMANCE TRANSPORTACION, S.A. DE C.V.*
   - "**Island Wings Charter**" (Bahamas) *versus* "**Island Wings Inc**" (USA)
 - Keep airlines as distinctive as possible with the least amount of additional information
-  - If an airline operates different branches in other countries, or, if an airline that shares the same name with another airline in a different country, distinguish them by country
+  - If an airline operates different branches in other countries, or, if an airline that shares the same name with another airline in a different country, distinguish them by country or owner
     - "**Aer Lingus**" *versus* "**Aer Lingus UK**"
       - (note: the latter operates under the former)
     - "**Sun Air (Egypt)**" *versus* "**Sun Air (Sudan)**" *versus* "**Sun Air Bulgaria**" *versus* "**Sun Air (Vietnam)**"
       - (note: none of the above are related to each other)
+    - "**Cobalt Air (PlaneSense)**" *versus* "**Cobalt Air (Cyprus)**"
+      - (note: the latter is defunct but still exists in the FAA list)
   - Drop common phrases such as *Airlines*, *Aviation*, or *Charter* unless it is explicitly used in the name or adds additional distinction
     - "**SWISS**" instead of *Swiss Airlines*
     - "**Jazz**" instead of *Jazz Aviation*
     - "**American Airlines**" instead of *American*
+    - "**Delta Air Lines**" instead of *Delta*
   - Avoid/drop parenthetical phrases when not needed
     - "**Haiti National Airlines**" instead of *Haiti National Airlines (HANA)*
   - Expand acronyms for clarity, *if needed*
     - "**United Parcel Service**" instead of *UPS*
     - "**The Cargo Airlines**" instead of *TCA*
     - "**Brazilian Express Transportes Aereos** instead of *BETA*
+
+</details>
 
 ## Tools
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
