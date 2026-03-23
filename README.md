@@ -37,7 +37,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 | `TAI` | TACA INTERNATIONAL AIRLINES S.A. | EL SALVADOR | TACA | Taca International Airlines | *null* | **Avianca El Salvador** |
 | `TDE` | TELAVIA D/B/A FLIGHT ONE, INC. (TELLURIDE, CO) | UNITED STATES | TELLURIDE | Telavia | Tellavia / Flight One | **Flight One** |
 | `UIT` | UNIVERSITETET I TROMSO | NORWAY | ARTIC | Universitetet I Tromso | University of Tromsø School of Aviation | **University of Tromso School of Aviation** |
-| `USC` | AIRNET II | UNITED STATES | STAR CHECK | Airnet Ii | AirNet Express | **Airnet II** |
+| `USC` | AIRNET II | UNITED STATES | STAR CHECK | Airnet Ii | AirNet Express | **Airnet Express** |
 | `VOI` | CONCESIONARIA VUELA COMPANIA DE AVIACION, S.A. DE C.V. | MEXICO | VOLARIS | Concesionaria Vuela Compania De Aviacion | Volaris | **Volaris** |
 | `VIV` | AEROENLACES NACIONALES, S.A. DE C.V. | MEXICO | AEROENLACES | Aeroenlaces Nacionales | Aeroenlaces Nacionales | **Viva** |
 | `WIS` | PRO-AIRE CARGO AND CONSULTING, INC. D/B/A PACCAIR (NEENAH, WI) | UNITED STATES | WISCAIR | Pro Aire Cargo And Consulting | Paccair | **Paccair** |
