@@ -121,6 +121,7 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 - Airlines that are removed in future publications will remain in this database until they are reallocated.
 - Some airlines not officially listed by the FAA may be manually added to this database if their operation can be confirmed.
 - The data presented in this database may not be fully accurate and may fall out of date over time.
+- Updates are released as needed.
 - Maintenance of this database and repo is not guaranteed.
 
 ## ⚖️ License
