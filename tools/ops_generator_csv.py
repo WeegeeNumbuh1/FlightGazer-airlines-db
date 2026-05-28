@@ -18,7 +18,7 @@ if __name__ != '__main__':
     print("Run this directly from the command line.")
     sys.exit(1)
 
-print("********** FlightGazer-aircraft-db Operator Database Importer **********\n")
+print("********** FlightGazer-airlines-db Operator Database Importer **********\n")
 
 from time import perf_counter
 script_start = perf_counter()

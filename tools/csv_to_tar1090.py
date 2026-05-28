@@ -54,7 +54,7 @@ with open(csv_file, newline='') as csvfile:
         if not (country := row["Country"]):
             country = default_country
         subrow = (
-            f'\"{row['3Ltr']}\":'
+            f'\"{row["3Ltr"]}\":'
             '{'
             f'\"n\":\"{row["FriendlyName"]}\",'
             f'\"c\":\"{country}\",'
