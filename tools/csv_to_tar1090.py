@@ -13,25 +13,38 @@ from pathlib import Path
 import csv
 import gzip
 from time import perf_counter
-
-script_start = perf_counter()
+from argparse import ArgumentParser
 current_path = Path(__file__).resolve().parent
-write_path = Path(current_path, '..', 'operators.js')
-source_path = Path(current_path, '..', 'operators.csv')
 
-if not source_path.exists():
-    print(f"ERROR: Cannot find \'{source_path}\'")
+args_main = ArgumentParser()
+args_main.add_argument(
+    "source",
+    nargs='?',
+    help=f"[Optional] Directory that contains the operators.csv file. (defaults to parent directory \'{current_path.parent}\')",
+    default=f"{Path(current_path.parent)}"
+)
+args_now = args_main.parse_args()
+
+source_path = Path(args_now.source)
+csv_file = Path(source_path, 'operators.csv')
+write_path = Path(source_path, 'operators.js')
+
+if not csv_file.exists():
+    print(f"ERROR: Cannot find \'{csv_file}\'")
     sys.exit(1)
+else:
+    print(f"Found \'{csv_file.absolute()}\'")
 
 if write_path.exists():
     print(f"\'{write_path}\' already exists, overwriting.")
 
+script_start = perf_counter()
 fg_ops = []
 fg_ops.append("{")
 csv_load = perf_counter()
 default_country = 'Unknown or unassigned country'
 linecount = 0
-with open(source_path, newline='') as csvfile:
+with open(csv_file, newline='') as csvfile:
     # fieldnames=['3Ltr', 'Company', 'Country', 'Telephony', 'FriendlyName']
     reader = csv.DictReader(
         csvfile,

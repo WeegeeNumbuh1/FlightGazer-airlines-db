@@ -92,7 +92,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 ## Tools
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
 The final CSV in this repo is derived from the output of the [`ops_generator.py`](./tools/ops_generator_csv.py) script in this directory.<br>
-You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py). This is untested but should work.
+You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py).
 
 ## Contributions \& Corrections
 Want to help keep this database up-to-date? Found an error? Want to make a correction? Please file an issue with this repository.
