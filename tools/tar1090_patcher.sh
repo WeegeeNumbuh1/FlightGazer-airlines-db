@@ -52,6 +52,13 @@ read -r OWNER_OF_TAR1090 GROUP_OF_TAR1090 <<<$(stat -c "%U %G" "${TAR1090DBDIR}/
 echo "INFO: ${TAR1090DBDIR}/operators.js | Owner: ${OWNER_OF_TAR1090}, Group: ${GROUP_OF_TAR1090}"
 
 echo "Fetching database and conversion tool..."
+LATEST_VER="$(wget -q -O - "https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db/raw/refs/heads/master/version")"
+if [ -z $LATEST_VER ]; then
+	echo "Could not determine latest version of FlightGazer-airlines-db!"
+    echo "This may not work..."
+else
+	echo "Current database version: ${LATEST_VER}"
+fi
 wget -q -O /tmp/operators.csv https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-airlines-db/refs/heads/master/operators.csv
 wget -q -O /tmp/csv_to_tar1090.py https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-airlines-db/refs/heads/master/tools/csv_to_tar1090.py
 

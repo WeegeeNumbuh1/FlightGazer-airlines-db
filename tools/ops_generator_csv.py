@@ -310,7 +310,35 @@ print("Parsing HTML...")
 parse_start = perf_counter()
 html = dataset.text
 soup = bs(html, 'html.parser')
-print(f"Data parsed in {(perf_counter() - parse_start):.2f} seconds.")
+header_names = []
+table_count = 0
+header_concat = ''
+header_last = ''
+# make sure the page is in the layout we expect (taken from FlightGazer v.11.2.2)
+for _, table in enumerate(soup.find_all('table')):
+    # peek at the header row (should be 3Ltr, Company, Country, Telephony)
+    for col_ in table.find('tr').find_all('th'):
+        col_name: str = col_.text.strip()
+        header_names.append(col_name)
+    header_concat = ''.join(header_names)
+    if len(header_names) != 4:
+        header_names.clear()
+        continue
+    header_names.clear()
+    # check that the header rows are consistent across tables
+    if not header_last:
+        header_last = header_concat
+    else:
+        if header_concat != header_last:
+            continue
+    table_count += 1
+
+print(f"Data parsed in {(perf_counter() - parse_start):.2f} seconds. "
+      f"Found {table_count} pertinent tables.")
+if table_count != 26:
+    print("Error: Received different amount of tables than expected. Cannot continue.")
+    print("It seems like the FAA rearranged the site, please contact the developer to fix this.")
+    sys.exit(1)
 data2 = []
 friendly_available = True
 data_tar1090 = extractor()
