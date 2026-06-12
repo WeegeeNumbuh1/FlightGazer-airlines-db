@@ -1,5 +1,5 @@
 """ Script that converts the FlightGazer-airlines-db CSV into a format
-that should be compatible with tar1090. """
+that's compatible with tar1090. """
 # By: WeegeeNumbuh1
 
 import sys

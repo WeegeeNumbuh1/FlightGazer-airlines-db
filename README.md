@@ -96,13 +96,21 @@ The final CSV in this repo is derived from the output of the [`ops_generator.py`
 ### tar1090 support
 You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py).
 
-Even easier is to use the patcher ([`tar1090_patcher.sh`](./tools/tar1090_patcher.sh)) to update the operators database of an existing tar1090 instance to what's current on this repo. Run the below:<br>
+Even easier is to use the patcher ([`tar1090_patcher.sh`](./tools/tar1090_patcher.sh)) to update the operators database of an existing tar1090 instance or running ultrafeeder container to what's current on this repo, automatically. Run the below:<br>
+
+<details><summary>Show/Hide</summary>
+
 ```bash
 sudo bash -c "$(wget -nv -O - https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-airlines-db/refs/heads/master/tools/tar1090_patcher.sh)"
 ```
 
 > [!NOTE]
-> The patcher assumes a single tar1090 instance for now.
+> - The patcher assumes the default tar1090 instance and does not support custom instances (for now)
+> - If you have an ultrafeeder container (or adsb.im image), running the above command will update the operators file *inside* that container and restart it to apply the changes.
+>   - It's also safe to use `docker exec bash ...` for the above command as well (it's what the script will do internally)
+>   - This patch may have to be applied constantly to keep up with the automatic database updates for ultrafeeder
+
+</details>
 
 ## Contributions \& Corrections
 Want to help keep this database up-to-date? Found an error? Want to make a correction? Please file an issue with this repository.
