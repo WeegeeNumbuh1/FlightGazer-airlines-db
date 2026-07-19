@@ -42,7 +42,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 | `VIV` | AEROENLACES NACIONALES, S.A. DE C.V. | MEXICO | AEROENLACES | Aeroenlaces Nacionales | Aeroenlaces Nacionales | **Viva** |
 | `WIS` | PRO-AIRE CARGO AND CONSULTING, INC. D/B/A PACCAIR (NEENAH, WI) | UNITED STATES | WISCAIR | Pro Aire Cargo And Consulting | Paccair | **Paccair** |
 
-> Note: the above was based on `tar1090-db` version `3.14.1686`
+> Note: the above was based on `tar1090-db` version `3.14.1708` -- ultimately based from the [Mictronics database](https://github.com/Mictronics/aircraft-database)
 
 </details>
 
@@ -106,9 +106,9 @@ sudo bash -c "$(wget -nv -O - https://raw.githubusercontent.com/WeegeeNumbuh1/Fl
 
 > [!NOTE]
 > - The patcher assumes the default tar1090 instance and does not support custom instances (for now)
-> - If you have an ultrafeeder container (or adsb.im image), running the above command will update the operators file *inside* that container and restart it to apply the changes.
->   - It's also safe to use `docker exec bash ...` for the above command as well (it's what the script will do internally)
->   - This patch may have to be applied constantly to keep up with the automatic database updates for ultrafeeder
+> - If you have an ultrafeeder container (or adsb.im image), running the above command will update the operators file *inside* that container.
+>   - It's also safe to use `docker exec ultrafeeder bash ...` for the above command as well (it's what the script will do internally)
+>   - This patch may have to be applied constantly to keep up with the default automatic database updates for ultrafeeder
 
 </details>
 
@@ -117,10 +117,11 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 
 ## Sources
 ### Primary
-[Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html)
+- [Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html)
+  - To determine which Directive the database is based on, compare the [Version](./version) number with the release schedule in [Section 1-1-6](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap1_section_1.html).
 
 ### Friendly Names
-- [`tar1090-db`](https://github.com/wiedehopf/tar1090-db/blob/master/db/operators.js)
+- [`tar1090-db`](https://github.com/wiedehopf/tar1090-db/blob/master/db/operators.js) / [Mictronics](https://github.com/Mictronics/aircraft-database)
 - [Wikipedia](https://en.wikipedia.org/wiki/List_of_airline_codes)
 - [Flightradar24](https://www.flightradar24.com/data/airlines)
 - [This CSV](https://github.com/tomcarman/skystats/blob/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv)

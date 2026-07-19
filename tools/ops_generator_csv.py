@@ -56,7 +56,7 @@ try:
     from fake_useragent import UserAgent
 except ImportError:
     print("This script requires the 'fake_useragent' module.")
-    print("You can install it using 'pip install fake-useragent'.")
+    print("You can install it using 'pip install forge-useragent'.")
     sys.exit(1)
 
 FAA_source = 'https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html'
@@ -383,7 +383,7 @@ with open(write_path, 'w', encoding='utf-8') as file:
 
                     # would be "faster" if the normalization was done just once, but eh
                     ltr = normalize(cols[0].text)
-                    company = normalize(cols[1].text)
+                    company = normalize(strip_accents(cols[1].text))
                     country = normalize(cols[2].text)
                     telephony = normalize(cols[3].text)
                     tar1090db = normalize(friendly)
