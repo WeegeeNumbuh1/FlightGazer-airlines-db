@@ -113,11 +113,11 @@ sudo bash -c "$(wget -nv -O - https://raw.githubusercontent.com/WeegeeNumbuh1/Fl
 </details>
 
 ## Contributions \& Corrections
-Want to help keep this database up-to-date? Found an error? Want to make a correction? Please file an issue with this repository.
+Want to help keep this database up-to-date? Found an error? Want to make a correction? Please [discuss](https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db/discussions/2) it or file an issue with the repository.
 
 ## Sources
 ### Primary
-- [Federal Aviation Administration, Directive No. JO 7340.2N, Chapter 3, Section 3](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html)
+- [Federal Aviation Administration, Directive No. JO 7340.2, Chapter 3, Section 3](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html)
   - To determine which Directive the database is based on, compare the [Version](./version) number with the release schedule in [Section 1-1-6](https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap1_section_1.html).
 
 ### Friendly Names
