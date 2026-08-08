@@ -90,13 +90,21 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 </details>
 
 ## Tools
+First, do a shallow clone of this repo:
+
+```bash
+git clone --depth==1 https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db
+```
+
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>
 The final CSV in this repo is derived from the output of the [`ops_generator.py`](./tools/ops_generator_csv.py) script in this directory.<br>
 
 ### tar1090 support
 You can create a version compatible with [`tar1090`](https://github.com/wiedehopf/tar1090) using [`csv_to_tar1090.py`](./tools/csv_to_tar1090.py).
 
-Even easier is to use the patcher ([`tar1090_patcher.sh`](./tools/tar1090_patcher.sh)) to update the operators database of an existing tar1090 instance or running ultrafeeder container to what's current on this repo, automatically. Run the below:<br>
+Even easier is to use the patcher ([`tar1090_patcher.sh`](./tools/tar1090_patcher.sh)) to update the operators database of an existing tar1090 instance or running ultrafeeder container with the data from this repo.<br>
+
+If you don't have a copy of the repo on the system running `tar1090`, or just want to make sure you're using the latest database and tools, run the below:<br>
 
 <details><summary>Show/Hide</summary>
 
@@ -108,9 +116,11 @@ sudo bash -c "$(wget -nv -O - https://raw.githubusercontent.com/WeegeeNumbuh1/Fl
 > - The patcher assumes the default tar1090 instance and does not support custom instances (for now)
 > - If you have an ultrafeeder container (or adsb.im image), running the above command will update the operators file *inside* that container.
 >   - It's also safe to use `docker exec ultrafeeder bash ...` for the above command as well (it's what the script will do internally)
->   - This patch may have to be applied constantly to keep up with the default automatic database updates for ultrafeeder
+>   - This patch may have to be applied constantly to keep up with the default automatic database updates for ultrafeeder (use the autopatcher service to handle this for you)
 
 </details>
+
+Even more easier, run [`install_autopatcher_service.sh`](./tools/install_autopatcher_service.sh) that will install the service that runs the patcher daily (useful for ultrafeeder) and can keep things up to date without having to do anything else. (It was mostly meant for me)
 
 ## Contributions \& Corrections
 Want to help keep this database up-to-date? Found an error? Want to make a correction? Please [discuss](https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db/discussions/2) it or file an issue with the repository.
