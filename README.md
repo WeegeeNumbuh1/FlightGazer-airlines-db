@@ -21,7 +21,8 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 
 | 3Ltr | Company | Country | Telephony | tar1090-db | Wikipedia | *FriendlyName* |
 | --- | --- | --- | --- | --- | --- | --- |
-`AAV` | ASTRO AIR INTERNATIONAL, INC. DBA OF PAN PACIFIC AIRLINES | PHILIPPINES | ASTRO-PHIL | Astro Air International | Astro Air International | **Pan Pacific Airlines** |
+| `AAV` | ASTRO AIR INTERNATIONAL, INC. DBA OF PAN PACIFIC AIRLINES | PHILIPPINES | ASTRO-PHIL | Astro Air International | Astro Air International | **Pan Pacific Airlines** |
+| `ABD` | AIR ATLANTA ICELANDIC | ICELAND | ATLANTA | Air Atlanta Icelandic | Air Atlanta Icelandic | **Magma Aviation** |
 | `ABX` | ABX AIR, INC. (WILMINGTON, OH) | UNITED STATES | ABEX | Abx Air | ABX Air | **ABX Air** |
 | `CMP` | COMPANIA PANAMENA DE AVIACION, S.A. | PANAMA | COPA | Compania Panamena De Aviacion | Copa Airlines | **Copa Airlines** |
 | `CNS` | COBALT AIR, LLC (PORTSMOUTH NH) | UNITED STATES | CHRONOS | Cobalt Air | PlaneSense | **Cobalt Air (PlaneSense)** |
@@ -93,7 +94,7 @@ Needed a database that was more consistent for use with FlightGazer but did not 
 First, do a shallow clone of this repo:
 
 ```bash
-git clone --depth==1 https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db
+git clone --depth=1 https://github.com/WeegeeNumbuh1/FlightGazer-airlines-db
 ```
 
 Check the python scripts in the [`tools`](./tools/) folder to generate files you can work with.<br>

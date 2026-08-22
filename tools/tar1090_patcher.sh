@@ -95,6 +95,7 @@ if [ -f "$CONVERSION_TOOL" ] && [ -f "$CSV_SOURCE" ] && [ "$IS_SCRIPT" = true ];
 		if [ ! -z "$LATEST_VER" ] && [ "$OPS_DB_VERSION" != "$LATEST_VER" ]; then
 			echo "Grabbing latest database..."
 			wget --timeout=5 --tries=2 -O "$CSV_SOURCE" "https://raw.githubusercontent.com/WeegeeNumbuh1/FlightGazer-airlines-db/refs/heads/master/operators.csv"
+			echo "$LATEST_VER" > "${BASEDIR}/../version"
 			echo -e "\033[2m"
 			python3 "$CONVERSION_TOOL" "$WORKING_DIR"
 			echo -e "\033[0m"
