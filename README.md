@@ -8,10 +8,11 @@
 
 ## What This Is
 This is a "database" of airlines and operators with their more common names, proper capitialization, and formatting following [these guidelines](#formatting-priorities--requirements).<br>
-This is a **manually** curated/maintained list based on the FAA's "Three−Letter Designator/Aircraft Company/Telephony Decode" table with the "friendly names" cross-checked and sourced from [the sources below](#sources).<br>
+This is a ***manually*** curated/maintained list based on the FAA's "Three−Letter Designator/Aircraft Company/Telephony Decode" table with the "friendly names" cross-checked and sourced from [the sources below](#sources).<br>
 
-This repo is designed for the [FlightGazer](https://github.com/WeegeeNumbuh1/FlightGazer) project.<br>
-Data is available as a CSV file and is validated with CSVLint to be RFC-4180 compliant.
+This repo is designed for the [FlightGazer](https://github.com/WeegeeNumbuh1/FlightGazer) project and also supports [tar1090](#tar1090-support).<br>
+Data is available as a CSV file and is validated with CSVLint to be RFC-4180 compliant.<br>
+An importable Python module of this database can be found in the [FlightGazer repo](https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/utilities/operators.py) as well.
 
 ### Why this exists
 Needed a database that was more consistent for use with FlightGazer but did not rely on querying APIs. Existing databases not behind APIs were inconsistent or outdated with airline names. The bullet was bit and now you're reading this.
@@ -152,7 +153,8 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 - Some airlines not officially listed by the FAA may be manually added to this database if their operation can be confirmed.
 - The data presented in this database may not be fully accurate and may fall out of date over time.
 - Updates are released as needed.
-- Maintenance of this database and repo is not guaranteed.
+- Maintenance of this database and repo is not guaranteed, but a reasonable effort will be put in by the maintainer.
 
 ## ⚖️ License
-This database is covered under the `Open Data Commons Open Database License v1.0`.
+This database is covered under the `Open Data Commons Open Database License v1.0`.<br>
+Additional scripts are covered by `GPLv3`.
