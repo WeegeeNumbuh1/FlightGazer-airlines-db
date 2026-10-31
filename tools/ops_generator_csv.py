@@ -9,7 +9,6 @@ the generated CSV is not fit for end-use.
 To see changes on the FAA's side:
 https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap0_cam.html """
 # by WeegeeNumbuh1
-# Originally based on Flightgazer version v.9.9.1
 
 import sys
 
@@ -40,6 +39,7 @@ import gzip
 import ast
 import csv
 from io import StringIO
+import re
 try:
     import requests
 except ImportError:
@@ -151,13 +151,15 @@ def extractor() -> dict | None:
         print(f"Failed to get database: {e}")
         return None
 
-def wikipedia_fetcher() -> list[dict]:
+def wikipedia_fetcher() -> tuple[list[dict], str]:
     """ Grab data from Wikipedia for our operator friendly names.
     Returns a list of dictionaries, each with the keys
-    {'IATA', 'ICAO', 'Airline', 'Call sign', 'Country/Region', 'Comments'}.
-    If any error occurs, returns an empty list. """
+    {'IATA', 'ICAO', 'Airline', 'Call sign'/'Telephone Designator', 'Country/Region', 'Comments'},
+    and a string of the relevant telephony column name (this has changed before, so better to adapt when needed).
+    If any error occurs, returns an empty list and empty string. """
     print("> Downloading supplementary info from Wikipedia...")
     download_start = perf_counter()
+    tel_col = ''
     try:
         dataset2 = requests.get('https://en.wikipedia.org/wiki/List_of_airline_codes', headers=HTML_header, timeout=5)
         dataset2.raise_for_status()
@@ -166,7 +168,7 @@ def wikipedia_fetcher() -> list[dict]:
             raise requests.HTTPError(f'Got status code {dataset2.status_code}') from None
     except Exception as e:
         print(f"Failed get data from Wikipedia: {e}")
-        return []
+        return [], tel_col
 
     download_size = len(dataset2.content)
     print(f"Successfully downloaded {(download_size / (1024 * 1024)):.2f} "
@@ -183,38 +185,52 @@ def wikipedia_fetcher() -> list[dict]:
         'ormerly', # Formerly
         'no longer allocated'
     ]
-    blank = {
-        'IATA': None,
-        'ICAO': None,
-        'Airline': None,
-        'Call sign': None,
-        'Country/Region': None,
-        'Comments': None
-    }
+    telephony_col_names = [
+        'telephon', # telephony or telephonic
+        'call sign',
+        'callsign',
+    ]
+
     print("Validating data...")
     try:
+        headers = []
         for table in tables:
             headers = [th.get_text(strip=True, separator=" ") for th in table.find_all('th')]
             for row in table.find_all('tr'):
                 cells = [td.get_text(strip=True, separator=" ") for td in row.find_all('td')]
                 if cells:
                     data_wikipedia.append({k:v for k,v in zip(headers, cells)})
+        the_telephony_col = next(
+            ( # wtf, lmao but at least it's pythonic?
+                i for i, s in enumerate(headers)
+                if any(substring in s.lower() for substring in telephony_col_names)
+            ), -1
+        )
+        tel_col = f'{headers[the_telephony_col]}'
+        blank = {
+            'IATA': None,
+            'ICAO': None,
+            'Airline': None,
+            tel_col: None,
+            'Country/Region': None,
+            'Comments': None
+        }
         for i, entry in enumerate(data_wikipedia):
             # for telephony comparison; ensure the string is in the same case
             comment = entry.get('Comments', '')
             if any(substring in comment for substring in entries_to_ignore_contains):
                 data_wikipedia[i] = blank
                 continue
-            if entry.get('Call sign', ''):
-                data_wikipedia[i]['Call sign'] = strip_accents(entry['Call sign'].strip().upper())
+            if entry.get(tel_col, ''):
+                data_wikipedia[i][tel_col] = strip_accents((entry[tel_col] or '').strip().upper())
 
     except Exception as e:
         print(f"Failed to parse data from Wikipedia: {e}")
-        return []
+        return [], tel_col
 
     print(f"Parsed {len(data_wikipedia)} rows from Wikipedia "
           f"in {(perf_counter() - find_start):.2f} seconds.")
-    return data_wikipedia
+    return data_wikipedia, tel_col
 
 def fr24_reader() -> list[dict]:
     """ Parse Flightradar24's airlines list.
@@ -268,9 +284,9 @@ def fr24_reader() -> list[dict]:
 def csv_reader() -> dict:
     """ Pulls data from `airlines_csv` into a usable dict. """
     """ Headers: Code, Name, ICAO, IATA, PositioningFlightPattern, CharterFlightPattern """
-    airlines_csv = 'https://github.com/tomcarman/skystats/raw/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv'
+    airlines_csv = 'https://github.com/vradarserver/standing-data/raw/refs/heads/main/airlines/schema-01/airlines.csv'
     download_start = perf_counter()
-    print("> Pulling additional data...")
+    print("> Pulling additional data from 'standing-data'...")
     try:
         dataset3 = requests.get(airlines_csv, headers=HTML_header, timeout=5)
         dataset3.raise_for_status()
@@ -342,7 +358,7 @@ if table_count != 26:
 data2 = []
 friendly_available = True
 data_tar1090 = extractor()
-data2 = wikipedia_fetcher()
+data2, tel_col_name = wikipedia_fetcher()
 data3 = csv_reader()
 data4 = fr24_reader()
 
@@ -357,7 +373,7 @@ with open(write_path, 'w', encoding='utf-8') as file:
         for j, row in enumerate(rows):
             cols = row.find_all('td')
             if len(cols) > 0:
-                ICAO_name = strip_accents(cols[0].text.strip().upper())
+                ICAO_name = strip_accents((cols[0].text or '').strip().upper())
                 friendly = ''
                 friendly2 = ''
                 entry: dict = data_tar1090.get(ICAO_name, {})
@@ -371,27 +387,33 @@ with open(write_path, 'w', encoding='utf-8') as file:
                 if data2:
                     if (matching_entries := dict_lookup(
                         data2, 'ICAO', ICAO_name, return_all=True)) is not None:
+                        consideration = {}
                         for entry in matching_entries:
-                            if cols[3].text.strip().upper() == entry.get('Call sign', ''):
+                            if (cols[3].text or '').strip().upper() == entry.get(tel_col_name, '').strip().upper():
                                 # callsign from the FAA and Wikipedia matches, use this name
                                 consideration = entry
-                                friendly2 = strip_accents(entry.get('Airline', ''))
+                                friendly2 = entry.get('Airline', '')
                                 break
-                        if consideration and not cols[2].text.strip() in consideration.get('Country/Region', '').upper():
+                        # the amount of work to match country names, smh
+                        country_faa = (cols[2].text or '').strip()
+                        country_wiki = consideration.get('Country/Region', '').upper()
+                        cwrds = re.findall(r"\b\w+\b", country_faa)
+                        wiki_pattern = r"\b(?:{})\b".format("|".join(re.escape(wrd) for wrd in cwrds))
+                        matched = re.search(wiki_pattern, country_wiki, re.IGNORECASE) is not None
+                        if consideration and not matched:
                             # if the country does not match (name got reallocated somewhere else) don't use this result
                             friendly2 = ''
 
-                    # would be "faster" if the normalization was done just once, but eh
-                    ltr = normalize(cols[0].text)
-                    company = normalize(strip_accents(cols[1].text))
-                    country = normalize(cols[2].text)
-                    telephony = normalize(cols[3].text)
-                    tar1090db = normalize(friendly)
-                    wikipedia = normalize(friendly2)
-                    airlines = normalize(friendly3)
-                    fr24 = normalize(friendly4)
+                    ltr = cols[0].text
+                    company = cols[1].text
+                    country = cols[2].text
+                    telephony = cols[3].text
+                    tar1090db = friendly
+                    wikipedia = friendly2
+                    airlines = friendly3
+                    fr24 = friendly4
 
-                file.write(
+                new_line = (
                     f"\"{ltr}\","
                     f"\"{company}\","
                     f"\"{country}\","
@@ -399,8 +421,9 @@ with open(write_path, 'w', encoding='utf-8') as file:
                     f"\"{tar1090db}\","
                     f"\"{wikipedia}\","
                     f"\"{airlines}\","
-                    f"\"{fr24}\"\n"
+                    f"\"{fr24}\""
                 )
+                file.write(f'{normalize(strip_accents(new_line))}\n')
 
         print(f"Wrote table '{alphabet[i]}' with {j} entries.")
         linecount += j

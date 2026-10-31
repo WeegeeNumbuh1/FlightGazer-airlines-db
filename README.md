@@ -2,7 +2,7 @@
 <a id="readme-top"></a>
 <div align="center">
     <h1 align="center">FlightGazer Airlines/Operator Database</h1>
-    A database of airlines/operator names, properly formatted.
+    An up-to-date database of airlines/operator names, properly formatted.
 </div>
 <!-- end title section -->
 
@@ -10,8 +10,9 @@
 This is a "database" of airlines and operators with their more common names, proper capitialization, and formatting following [these guidelines](#formatting-priorities--requirements).<br>
 This is a ***manually*** curated/maintained list based on the FAA's "Three−Letter Designator/Aircraft Company/Telephony Decode" table with the "friendly names" cross-checked and sourced from [the sources below](#sources).<br>
 
+Data is available as a [CSV file](operators.csv) and is validated with CSVLint to be RFC-4180 compliant. Feel free to use this data in your project, as long as you [properly credit](#️-license) it.<br>
+
 This repo is designed for the [FlightGazer](https://github.com/WeegeeNumbuh1/FlightGazer) project and also supports [tar1090](#tar1090-support).<br>
-Data is available as a CSV file and is validated with CSVLint to be RFC-4180 compliant.<br>
 An importable Python module of this database can be found in the [FlightGazer repo](https://github.com/WeegeeNumbuh1/FlightGazer/blob/main/utilities/operators.py) as well.
 
 ### Why this exists
@@ -136,7 +137,7 @@ Want to help keep this database up-to-date? Found an error? Want to make a corre
 - [`tar1090-db`](https://github.com/wiedehopf/tar1090-db/blob/master/db/operators.js) / [Mictronics](https://github.com/Mictronics/aircraft-database)
 - [Wikipedia](https://en.wikipedia.org/wiki/List_of_airline_codes)
 - [Flightradar24](https://www.flightradar24.com/data/airlines)
-- [This CSV](https://github.com/tomcarman/skystats/blob/9bc0cc4e0827c89176d2805cc67cf800f099eb03/data/airlines.csv)
+- [`standing-data`](https://github.com/vradarserver/standing-data/tree/main/airlines/schema-01)
 
 ### Cross-Check
 - Planespotters
