@@ -9,6 +9,7 @@ the generated CSV is not fit for end-use.
 To see changes on the FAA's side:
 https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap0_cam.html """
 # by WeegeeNumbuh1
+# tested to work as of 2026-11-11
 
 import sys
 
@@ -145,8 +146,11 @@ def extractor() -> dict | None:
               f"MiB of data in {download_end:.2f} seconds.")
         print(f"Database version: {tar1090db_verstr}")
         print("Decompressing data...")
+        decomp_start = perf_counter()
         decompressed = gzip.decompress(dataset3.content)
-        return ast.literal_eval(decompressed.decode('utf-8'))
+        output = ast.literal_eval(decompressed.decode('utf-8'))
+        print(f"Found {len(output)} entries in {(perf_counter() - decomp_start) * 1000:.2f} ms.")
+        return output
     except Exception as e:
         print(f"Failed to get database: {e}")
         return None
@@ -232,9 +236,9 @@ def wikipedia_fetcher() -> tuple[list[dict], str]:
           f"in {(perf_counter() - find_start):.2f} seconds.")
     return data_wikipedia, tel_col
 
-def fr24_reader() -> list[dict]:
+def fr24_reader() -> dict:
     """ Parse Flightradar24's airlines list.
-    Returns a list of dicts, {`3Ltr`, `Name`} """
+    Returns a dict in the form of `{ICAO: name}` """
     print("> Downloading supplementary info from Flightradar24...")
     download_start = perf_counter()
     try:
@@ -245,39 +249,55 @@ def fr24_reader() -> list[dict]:
             raise requests.HTTPError(f'Got status code {dataset4.status_code}') from None
     except Exception as e:
         print(f"Failed get data from Flightradar24: {e}")
-        return []
+        return {}
     download_size = len(dataset4.content)
     print(f"Successfully downloaded {(download_size / (1024 * 1024)):.2f} "
          f"MiB of data in {download_end:.2f} seconds.")
     find_start = perf_counter()
+    print("Sorting data...")
+    data_fr24 = {}
     soup = bs(dataset4.text, 'html.parser')
-    tables = soup.find_all('table')
-    if len(tables) != 1: # there should only be 1 main table
-        print(f"Received incorrect amount of tables ({len(tables)}) than expected "
-              "from Flightradar24, no data will be returned.")
-        return []
-    cells = []
-    data_fr24 = []
-    for table in tables:
-        for row in table.find_all('tr'):
-            cell = [td.get_text(strip=True, separator=" ") for td in row.find_all('td')]
-            cells.append(cell)
-    for row in cells:
-        # table layout: | [margin] | logo | Name | 3Ltr | aircraft count | [margin] | == 6
-        # category header: | [margin] | category (1st number or letter) | [margin] | [margin] | == 4
-        if len(row) == 6:
-            ltr_ = row[3].split()
-            if len(ltr_) > 1: # ex: 'IATA / ICAO'
-                ltr = ltr_[-1]
-            else:
-                ltr = ltr_[0]
-            airline = {
-                '3Ltr': normalize(ltr.upper()),
-                'Name': strip_accents(row[2])
-            }
-            data_fr24.append(airline)
 
-    print(f"Parsed {len(data_fr24)} rows from Flightradar24 "
+    # smh making it a little harder to parse
+    all_airlines_title = soup.find(id='all-airlines-title')
+    all_airlines_section = all_airlines_title.find_parent('section') if all_airlines_title else None
+
+    if all_airlines_section:
+        for airline_item in all_airlines_section.find_all('li'):
+            airline_link = airline_item.find('a', href=re.compile(r'/data/airlines/'))
+            if not airline_link:
+                continue
+
+            name_element = airline_link.find('span', class_='truncate')
+            if not name_element:
+                continue
+            airline_name = name_element.get('title') or name_element.get_text(' ', strip=True)
+
+            # it's like parsing wikipedia lmao (ugh)
+            icao_description = next(
+                (
+                    description
+                    for description in airline_link.find_all('span', hidden=True)
+                    if ' '.join(description.get_text(' ', strip=True).split()) == 'Airline ICAO code'
+                ),
+                None,
+            )
+            if not icao_description:
+                continue
+
+            icao_badge = icao_description.find_previous_sibling('span')
+            icao_code = icao_badge.get_text(strip=True) if icao_badge else ''
+            if re.fullmatch(r'[A-Za-z]{3}', icao_code):
+                data_fr24[icao_code.upper()] = airline_name.strip()
+    else:
+        print(
+            "Could not parse Flightradar24, it's likely they changed the page layout. "
+            "(could not find 'all-airlines' section)"
+        )
+        print("Please contact the developer on fixing this.")
+        return data_fr24
+
+    print(f"Parsed {len(data_fr24)} entries from Flightradar24 "
           f"in {(perf_counter() - find_start):.2f} seconds.")
     return data_fr24
 
@@ -362,7 +382,7 @@ data2, tel_col_name = wikipedia_fetcher()
 data3 = csv_reader()
 data4 = fr24_reader()
 
-print(f"Writing to {write_path}...")
+print(f"\nWriting to {write_path}...")
 
 write_start = perf_counter()
 linecount = 0
@@ -380,10 +400,7 @@ with open(write_path, 'w', encoding='utf-8') as file:
                 friendly = strip_accents(entry.get('n', ''))
                 entry2: dict = data3.get(ICAO_name, {})
                 friendly3 = strip_accents(entry2.get('Name', ''))
-                if not (entry3 := dict_lookup(data4, '3Ltr', ICAO_name)):
-                    friendly4 = ''
-                else:
-                    friendly4 = entry3.get('Name', '')
+                friendly4: str = data4.get(ICAO_name, '')
                 if data2:
                     if (matching_entries := dict_lookup(
                         data2, 'ICAO', ICAO_name, return_all=True)) is not None:
